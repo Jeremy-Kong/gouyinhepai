@@ -10,7 +10,6 @@
     
     <!-- 预加载首屏关键资源 -->
     <link rel="preload" href="styles.css" as="style">
-    <link rel="preload" href="images/kong-astronaut.png" as="image" fetchpriority="high">
     
     <!-- 预连接到图片服务器 -->
     <link rel="preconnect" href="https://guanwang-1392916619.cos.ap-shanghai.myqcloud.com" crossorigin>
@@ -56,49 +55,49 @@
                 <div class="kong-options">
                 <div class="kong-item active" data-kong="astronaut">
                     <div class="kong-avatar">
-                        <img class="kong-image" src="images/kong-astronaut.png" alt="宇航员小孔" loading="lazy" decoding="async">
+                        <img class="kong-image" src="images/kong-astronaut.png" data-src="images/kong-astronaut.png" alt="宇航员小孔" loading="eager" decoding="async" fetchpriority="high">
                     </div>
                     <span>宇航员</span>
                 </div>
                 <div class="kong-item" data-kong="cyberpunk">
                     <div class="kong-avatar">
-                        <img class="kong-image" src="images/kong-cyberpunk.png" alt="赛博朋克小孔" loading="lazy" decoding="async">
+                        <img class="kong-image" data-src="images/kong-cyberpunk.png" alt="赛博朋克小孔" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <span>赛博朋克</span>
                 </div>
                 <div class="kong-item" data-kong="pilot">
                     <div class="kong-avatar">
-                        <img class="kong-image" src="images/kong-village.png" alt="飞行员小孔" loading="lazy" decoding="async">
+                        <img class="kong-image" data-src="images/kong-village.png" alt="飞行员小孔" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <span>飞行员</span>
                 </div>
                 <div class="kong-item" data-kong="polar">
                     <div class="kong-avatar">
-                        <img class="kong-image" src="images/kong-polar.png" alt="极地小孔" loading="lazy" decoding="async">
+                        <img class="kong-image" data-src="images/kong-polar.png" alt="极地小孔" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <span>极地</span>
                 </div>
                 <div class="kong-item" data-kong="steampunk">
                     <div class="kong-avatar">
-                        <img class="kong-image" src="images/kong-steampunk.png" alt="蒸汽朋克小孔" loading="lazy" decoding="async">
+                        <img class="kong-image" data-src="images/kong-steampunk.png" alt="蒸汽朋克小孔" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <span>蒸汽朋克</span>
                 </div>
                 <div class="kong-item" data-kong="village">
                     <div class="kong-avatar">
-                        <img class="kong-image" src="images/kong-pilot.png" alt="乡土小孔" loading="lazy" decoding="async">
+                        <img class="kong-image" data-src="images/kong-pilot.png" alt="乡土小孔" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <span>乡土</span>
                 </div>
                 <div class="kong-item" data-kong="coolboy">
                     <div class="kong-avatar">
-                        <img class="kong-image" src="images/kong-coolboy.png" alt="酷boy小孔" loading="lazy" decoding="async">
+                        <img class="kong-image" data-src="images/kong-coolboy.png" alt="酷boy小孔" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <span>酷boy</span>
                 </div>
                 <div class="kong-item" data-kong="fashion">
                     <div class="kong-avatar">
-                        <img class="kong-image" src="images/kong-fashion.png" alt="时尚先锋小孔" loading="lazy" decoding="async">
+                        <img class="kong-image" data-src="images/kong-fashion.png" alt="时尚先锋小孔" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <span>时尚先锋</span>
                 </div>
@@ -134,8 +133,8 @@
         <div class="result-section" id="resultSection" hidden>
             <h3>✨ 冒险合成图 ✨</h3>
             <div class="result-image-container">
-                <canvas id="resultCanvas" class="result-canvas"></canvas>
-                <img id="resultImage" class="result-image" hidden>
+                <canvas id="resultCanvas" class="result-canvas" hidden></canvas>
+                <img id="resultImage" class="result-image" hidden alt="冒险合成图">
             </div>
             <button type="button" class="btn btn-publish" id="publishBtn">
                 <span>📱</span> 发布抖音

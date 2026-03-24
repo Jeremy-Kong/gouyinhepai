@@ -27,6 +27,17 @@ const publishBtn = document.getElementById('publishBtn');
 const loadingOverlay = document.getElementById('loadingOverlay');
 const toast = document.getElementById('toast');
 
+const kongAssetMap = {
+    astronaut: 'images/kong-astronaut.png',
+    cyberpunk: 'images/kong-cyberpunk.png',
+    pilot: 'images/kong-village.png',
+    polar: 'images/kong-polar.png',
+    steampunk: 'images/kong-steampunk.png',
+    village: 'images/kong-pilot.png',
+    coolboy: 'images/kong-coolboy.png',
+    fashion: 'images/kong-fashion.png'
+};
+
 // 显示提示
 function showToast(message, duration = 3000) {
     toast.textContent = message;
@@ -34,6 +45,16 @@ function showToast(message, duration = 3000) {
     setTimeout(() => {
         toast.classList.remove('show');
     }, duration);
+}
+
+function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error(`图片加载失败: ${src}`));
+        img.src = src;
+    });
 }
 
 // 抖音登录功能
@@ -178,90 +199,123 @@ async function generateAdventureImage() {
     // 设置画布大小
     canvas.width = 800;
     canvas.height = 600;
-    
-    // 绘制背景
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, '#667eea');
-    gradient.addColorStop(1, '#764ba2');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // 绘制标题
-    ctx.font = 'bold 36px Arial, sans-serif';
-    ctx.fillStyle = 'white';
-    ctx.textAlign = 'center';
-    ctx.fillText('小孔的冒险之旅', canvas.width / 2, 50);
-    
-    // 加载用户照片
-    const userImg = new Image();
-    userImg.crossOrigin = 'anonymous';
-    userImg.onload = () => {
-        // 绘制用户照片（左侧）
-        const userSize = 250;
-        const userX = 100;
-        const userY = 150;
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(userX + userSize/2, userY + userSize/2, userSize/2, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(userImg, userX, userY, userSize, userSize);
-        ctx.restore();
-        
-        // 绘制标签
-        ctx.font = '20px Arial, sans-serif';
-        ctx.fillText('冒险家', userX + userSize/2, userY + userSize + 40);
+
+    const kongNames = {
+        astronaut: '宇航员小孔',
+        cyberpunk: '赛博朋克小孔',
+        polar: '极地小孔',
+        steampunk: '蒸汽朋克小孔',
+        village: '乡土小孔',
+        pilot: '飞行员小孔',
+        coolboy: '酷boy小孔',
+        fashion: '时尚先锋小孔'
     };
-    userImg.src = selectedPhoto;
     
-    // 加载小孔图片
-    const kongImg = new Image();
-    kongImg.crossOrigin = 'anonymous';
-    kongImg.onload = () => {
-        // 绘制小孔照片（右侧）
-        const kongSize = 250;
-        const kongX = 450;
-        const kongY = 150;
+    try {
+        const [userImg, kongImg] = await Promise.all([
+            loadImage(selectedPhoto),
+            loadImage(kongAssetMap[selectedKong])
+        ]);
+
+        // 绘制海报背景
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, '#0b1120');
+        gradient.addColorStop(0.62, '#172554');
+        gradient.addColorStop(1, '#312e81');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 单主画面边框
+        const frameX = 48;
+        const frameY = 48;
+        const frameW = 704;
+        const frameH = 504;
+        const frameRadius = 30;
+
         ctx.save();
-        ctx.beginPath();
-        ctx.arc(kongX + kongSize/2, kongY + kongSize/2, kongSize/2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        roundRect(ctx, frameX - 8, frameY - 8, frameW + 16, frameH + 16, 36);
+        ctx.fill();
+        roundRect(ctx, frameX, frameY, frameW, frameH, frameRadius);
         ctx.clip();
-        ctx.drawImage(kongImg, kongX, kongY, kongSize, kongSize);
+        ctx.drawImage(userImg, frameX, frameY, frameW, frameH);
+
+        // 统一暗角和底部压暗，避免上下分段重复感
+        const overlay = ctx.createLinearGradient(frameX, frameY, frameX, frameY + frameH);
+        overlay.addColorStop(0, 'rgba(8, 15, 32, 0.10)');
+        overlay.addColorStop(0.55, 'rgba(8, 15, 32, 0.05)');
+        overlay.addColorStop(1, 'rgba(8, 15, 32, 0.65)');
+        ctx.fillStyle = overlay;
+        ctx.fillRect(frameX, frameY, frameW, frameH);
+
+        // 小孔融合到主画面右下区域，不形成第二张独立画面
+        const kongW = 188;
+        const kongH = 188;
+        const kongX = 516;
+        const kongY = 292;
+        ctx.save();
+        ctx.globalAlpha = 0.96;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.18)';
+        ctx.shadowBlur = 16;
+        roundRect(ctx, kongX, kongY, kongW, kongH, 20);
+        ctx.clip();
+        ctx.drawImage(kongImg, kongX, kongY, kongW, kongH);
         ctx.restore();
-        
-        // 绘制标签
-        const kongNames = {
-            'astronaut': '宇航员小孔',
-            'cyberpunk': '赛博朋克小孔',
-            'polar': '极地小孔',
-            'steampunk': '蒸汽朋克小孔',
-            'village': '乡土小孔',
-            'pilot': '飞行员小孔',
-            'coolboy': '酷boy小孔',
-            'fashion': '时尚先锋小孔'
-        };
-        ctx.fillText(kongNames[selectedKong], kongX + kongSize/2, kongY + kongSize + 40);
-        
-        // 绘制装饰性元素
-        ctx.font = '60px Arial';
-        ctx.fillText('🌟', canvas.width / 2, 200);
-        ctx.fillText('🚀', canvas.width / 2, 280);
-        ctx.fillText('🌈', canvas.width / 2, 360);
-        
-        // 绘制底部文字
-        ctx.font = '24px Arial, sans-serif';
-        ctx.fillText('#和小孔一起去冒险', canvas.width / 2, canvas.height - 50);
-        
+
+        // 用柔边把小孔过渡进同一张画面
+        const blend = ctx.createLinearGradient(kongX - 56, kongY, kongX + 40, kongY);
+        blend.addColorStop(0, 'rgba(8, 15, 32, 0.42)');
+        blend.addColorStop(1, 'rgba(8, 15, 32, 0)');
+        ctx.fillStyle = blend;
+        ctx.fillRect(kongX - 56, kongY, 96, kongH);
+        ctx.restore();
+
+        // 单底部信息条
+        ctx.fillStyle = 'rgba(7, 12, 24, 0.55)';
+        roundRect(ctx, 78, 426, 408, 96, 22);
+        ctx.fill();
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = 'rgba(255,255,255,0.78)';
+        ctx.font = '15px Arial, sans-serif';
+        ctx.fillText('JEREMY·KONG STUDIO', 102, 456);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 34px Arial, sans-serif';
+        ctx.fillText('和小孔一起去冒险', 102, 494);
+        ctx.font = '18px Arial, sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+        ctx.fillText(`${kongNames[selectedKong]} · #和小孔一起去冒险`, 102, 526);
+        ctx.restore();
+
         // 显示结果
-        loadingOverlay.hidden = true;
-        resultSection.hidden = false;
         generatedImage = canvas.toDataURL('image/png');
         resultImage.src = generatedImage;
         resultImage.hidden = false;
-        
+        resultCanvas.hidden = true;
+        resultSection.hidden = false;
+        loadingOverlay.hidden = true;
+
         // 滚动到结果区域
         resultSection.scrollIntoView({ behavior: 'smooth' });
-    };
-    kongImg.src = `images/kong-${selectedKong}.png`;
+    } catch (error) {
+        loadingOverlay.hidden = true;
+        showToast('合成失败，请重试', 3000);
+        console.error(error);
+    }
+}
+
+function roundRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
 }
 
 adventureBtn.addEventListener('click', generateAdventureImage);
@@ -316,41 +370,59 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // 图片懒加载优化
-    const lazyImages = document.querySelectorAll('img[loading="lazy"]');
-    
+    const lazyImages = document.querySelectorAll('.kong-image');
+
+    function markLoaded(img) {
+        img.classList.add('loaded');
+    }
+
+    function assignImageSource(img) {
+        if (!img.dataset.src || img.src) {
+            return;
+        }
+
+        img.addEventListener('load', () => markLoaded(img), { once: true });
+        img.addEventListener('error', () => markLoaded(img), { once: true });
+        img.src = img.dataset.src;
+    }
+
     lazyImages.forEach(img => {
-        // 如果图片已经缓存，直接添加loaded类
-        if (img.complete) {
-            img.classList.add('loaded');
-        } else {
-            // 监听图片加载完成
-            img.addEventListener('load', () => {
-                img.classList.add('loaded');
-            });
-            
-            // 加载失败时也要移除骨架屏
-            img.addEventListener('error', () => {
-                img.classList.add('loaded');
-            });
+        if (img.getAttribute('loading') === 'eager') {
+            if (img.complete && img.currentSrc) {
+                markLoaded(img);
+            } else {
+                img.addEventListener('load', () => markLoaded(img), { once: true });
+                img.addEventListener('error', () => markLoaded(img), { once: true });
+            }
+            return;
+        }
+
+        if (!('IntersectionObserver' in window)) {
+            assignImageSource(img);
         }
     });
-    
-    // 使用 Intersection Observer 优化图片加载
+
     if ('IntersectionObserver' in window) {
         const imageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.classList.add('loaded');
-                    imageObserver.unobserve(img);
+                if (!entry.isIntersecting) {
+                    return;
                 }
+
+                const img = entry.target;
+                assignImageSource(img);
+                imageObserver.unobserve(img);
             });
         }, {
-            rootMargin: '50px 0px',
+            rootMargin: '220px 0px',
             threshold: 0.01
         });
-        
-        lazyImages.forEach(img => imageObserver.observe(img));
+
+        lazyImages.forEach(img => {
+            if (img.getAttribute('loading') !== 'eager') {
+                imageObserver.observe(img);
+            }
+        });
     }
 });
 

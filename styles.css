@@ -484,11 +484,14 @@ body {
 }
 
 .result-image-container {
-    max-width: 600px;
+    max-width: 720px;
     margin: 0 auto 40px;
     border: 2px solid var(--border-color);
     overflow: hidden;
     position: relative;
+    border-radius: 28px;
+    background: #111827;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
 }
 
 .result-image-container::before {
@@ -512,6 +515,11 @@ body {
     width: 100%;
     height: auto;
     display: block;
+}
+
+.result-image {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
 }
 
 /* ===== 底通 ===== */
