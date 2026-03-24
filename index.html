@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小孔的冒险之旅</title>
+    
+    <!-- DNS 预解析 -->
+    <link rel="dns-prefetch" href="https://guanwang-1392916619.cos.ap-shanghai.myqcloud.com">
+    
+    <!-- 预加载首屏关键资源 -->
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="images/kong-astronaut.png" as="image" fetchpriority="high">
+    
+    <!-- 预连接到图片服务器 -->
+    <link rel="preconnect" href="https://guanwang-1392916619.cos.ap-shanghai.myqcloud.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- 关键CSS内联 -->
+    <style>
+        /* 首屏关键样式 - 防止闪烁 */
+        .kong-item img { opacity: 0; }
+        .kong-item img.loaded { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="logo">
+                <a class="studio-link" href="https://jeremykong.club/" target="_blank" rel="noopener noreferrer">JEREMY·KONG STUDIO</a>
+                <h1>🐾 小孔的冒险之旅</h1>
+            </div>
+            <div class="user-section" id="userSection">
+                <img src="images/avatar-default.svg" alt="头像" class="avatar" id="userAvatar">
+                <button type="button" class="btn btn-login" id="loginBtn">登录抖音账号</button>
+            </div>
+        </header>
+
+        <section class="hero-intro">
+            <p>和小孔一起去冒险吧！</p>
+        </section>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 左侧：选择小孔 -->
+            <section class="kong-section">
+                <div class="section-title">
+                    <span class="icon">🐕</span>
+                    <span>选择陪伴的小孔</span>
+                </div>
+                <div class="kong-options">
+                <div class="kong-item active" data-kong="astronaut">
+                    <div class="kong-avatar">
+                        <img class="kong-image" src="images/kong-astronaut.png" alt="宇航员小孔" loading="lazy" decoding="async">
+                    </div>
+                    <span>宇航员</span>
+                </div>
+                <div class="kong-item" data-kong="cyberpunk">
+                    <div class="kong-avatar">
+                        <img class="kong-image" src="images/kong-cyberpunk.png" alt="赛博朋克小孔" loading="lazy" decoding="async">
+                    </div>
+                    <span>赛博朋克</span>
+                </div>
+                <div class="kong-item" data-kong="pilot">
+                    <div class="kong-avatar">
+                        <img class="kong-image" src="images/kong-village.png" alt="飞行员小孔" loading="lazy" decoding="async">
+                    </div>
+                    <span>飞行员</span>
+                </div>
+                <div class="kong-item" data-kong="polar">
+                    <div class="kong-avatar">
+                        <img class="kong-image" src="images/kong-polar.png" alt="极地小孔" loading="lazy" decoding="async">
+                    </div>
+                    <span>极地</span>
+                </div>
+                <div class="kong-item" data-kong="steampunk">
+                    <div class="kong-avatar">
+                        <img class="kong-image" src="images/kong-steampunk.png" alt="蒸汽朋克小孔" loading="lazy" decoding="async">
+                    </div>
+                    <span>蒸汽朋克</span>
+                </div>
+                <div class="kong-item" data-kong="village">
+                    <div class="kong-avatar">
+                        <img class="kong-image" src="images/kong-pilot.png" alt="乡土小孔" loading="lazy" decoding="async">
+                    </div>
+                    <span>乡土</span>
+                </div>
+                <div class="kong-item" data-kong="coolboy">
+                    <div class="kong-avatar">
+                        <img class="kong-image" src="images/kong-coolboy.png" alt="酷boy小孔" loading="lazy" decoding="async">
+                    </div>
+                    <span>酷boy</span>
+                </div>
+                <div class="kong-item" data-kong="fashion">
+                    <div class="kong-avatar">
+                        <img class="kong-image" src="images/kong-fashion.png" alt="时尚先锋小孔" loading="lazy" decoding="async">
+                    </div>
+                    <span>时尚先锋</span>
+                </div>
+                </div>
+            </section>
+
+            <!-- 中间：箭头 -->
+            <div class="arrow">➜</div>
+
+            <!-- 右侧：上传照片 -->
+            <section class="upload-section">
+                <div class="section-title">
+                    <span class="icon">📷</span>
+                    <span>上传自己的照片</span>
+                </div>
+                <div class="upload-box" id="uploadBox">
+                    <input type="file" id="photoInput" accept="image/*" hidden>
+                    <div class="upload-placeholder" id="uploadPlaceholder">
+                        <span class="upload-icon">+</span>
+                        <p>点击上传照片</p>
+                    </div>
+                    <img id="previewImage" class="preview-image" hidden>
+                </div>
+                <div class="upload-action-area">
+                    <button type="button" class="btn btn-adventure" id="adventureBtn">
+                        <span>🚀</span> 去冒险
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- 生成结果区域 -->
+        <div class="result-section" id="resultSection" hidden>
+            <h3>✨ 冒险合成图 ✨</h3>
+            <div class="result-image-container">
+                <canvas id="resultCanvas" class="result-canvas"></canvas>
+                <img id="resultImage" class="result-image" hidden>
+            </div>
+            <button type="button" class="btn btn-publish" id="publishBtn">
+                <span>📱</span> 发布抖音
+            </button>
+        </div>
+
+        <!-- 底通 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <span class="footer-company">沅伯文化传媒工作室</span>
+                    <span class="footer-divider">/</span>
+                    <span class="footer-email">kongyuanbo@aliyun.com</span>
+                </div>
+                <div class="footer-legal">
+                    &copy; 2026 JEREMY·KONG. All rights reserved. | 琼ICP备2026003384号
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 加载提示 -->
+    <div class="loading-overlay" id="loadingOverlay" hidden>
+        <div class="loading-spinner"></div>
+        <p>AI正在生成中...</p>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast"></div>
+
+    <!-- 模拟抖音登录弹窗 -->
+    <div class="modal" id="loginModal" hidden>
+        <div class="modal-content">
+            <h3>🎵 抖音登录</h3>
+            <p>请使用抖音扫描二维码登录</p>
+            <div class="qr-code">
+                <div class="qr-placeholder">二维码区域</div>
+            </div>
+            <button type="button" class="btn btn-secondary" id="simulateLoginBtn">模拟登录成功</button>
+            <button type="button" class="btn btn-close" id="closeLoginModal">取消</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
