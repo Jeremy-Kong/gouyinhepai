@@ -1,0 +1,10 @@
+{
+  "name": "hepai-explore-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "main": "server.js",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "mysql2": "^3.15.3"
+  }
+}

@@ -1,0 +1,67 @@
+server {
+    server_name jeremykong.club www.jeremykong.club;
+    
+    root /var/www/html;
+    index index.html index.htm;
+    
+    # HTTP和HTTPS都支持
+    listen 80;
+    listen [::]:80;
+    listen [::]:443 ssl ipv6only=on;
+    listen 443 ssl;
+    
+    ssl_certificate /etc/letsencrypt/live/jeremykong.club/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/jeremykong.club/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    
+    # 小孔的冒险之旅
+    location /hepai/api/ {
+        client_max_body_size 30M;
+        rewrite ^/hepai/api/(.*)$ /$1 break;
+        proxy_pass http://127.0.0.1:3010;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /hepai/ {
+        alias /var/www/html/hepai/;
+        index index.html;
+        try_files $uri $uri/ =404;
+    }
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+    
+    # 抖音授权回调代理
+    location /douyin/ {
+        proxy_pass http://localhost:3001/douyin/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+    
+    # 抖音二维码授权
+    location /douyin/qrcode {
+        proxy_pass http://localhost:3002/qrcode;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+    
+    location /check-auth {
+        proxy_pass http://localhost:3002/check-auth;
+    }
+    
+    access_log /var/log/nginx/jeremykong.club.access.log;
+    error_log /var/log/nginx/jeremykong.club.error.log;
+}

@@ -1,0 +1,15 @@
+[Unit]
+Description=Xiaokong Explore Proxy
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/douyinhepai/explore-proxy
+ExecStart=/home/ubuntu/douyinhepai/explore-proxy/start.sh
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
