@@ -23,8 +23,9 @@
 
 ## 服务器部署信息
 
-- 页面目录: `/var/www/html/hepai/`
-- 旧测试目录: `/home/ubuntu/douyinhepai/`
+- 页面目录: `/var/www/hepai/`
+- 后端服务目录: `/home/ubuntu/douyinhepai/explore-proxy/`
+- 旧测试目录: `/var/www/html/hepai/`（不再使用）
 - Nginx 站点配置: `/etc/nginx/sites-available/jeremykong.club`
 - 域名路径通过 `location /hepai/` 暴露
 
@@ -157,13 +158,13 @@ GIT_SSH_COMMAND='ssh -i "/Users/m100448211/.ssh/github_gouyinhepai" -o Identitie
 静态文件同步到线上：
 
 ```bash
-scp -i ~/.ssh/xiaokong_deploy/id_rsa index.html styles.css script.js ubuntu@106.54.6.169:/var/www/html/hepai/
+scp -i ~/.ssh/xiaokong_deploy/id_rsa index.html styles.css script.js ubuntu@106.54.6.169:/var/www/hepai/
 ```
 
 图片同步：
 
 ```bash
-scp -i ~/.ssh/xiaokong_deploy/id_rsa images/* ubuntu@106.54.6.169:/var/www/html/hepai/images/
+scp -i ~/.ssh/xiaokong_deploy/id_rsa images/* ubuntu@106.54.6.169:/var/www/hepai/images/
 ```
 
 ## 建议的下一步

@@ -11,6 +11,16 @@ let isAdvancedGenerating = false;
 const loginBtn = document.getElementById('loginBtn');
 const loginModal = document.getElementById('loginModal');
 const closeLoginModal = document.getElementById('closeLoginModal');
+const wechatLoginModal = document.getElementById('wechatLoginModal');
+const closeWechatLoginModal = document.getElementById('closeWechatLoginModal');
+const openDouyinAppBtn = document.getElementById('openDouyinAppBtn');
+const copyOpenLinkBtn = document.getElementById('copyOpenLinkBtn');
+const publishGuideModal = document.getElementById('publishGuideModal');
+const closePublishGuideModal = document.getElementById('closePublishGuideModal');
+const publishOpenDouyinBtn = document.getElementById('publishOpenDouyinBtn');
+const publishDownloadBtn = document.getElementById('publishDownloadBtn');
+const publishCopyTagBtn = document.getElementById('publishCopyTagBtn');
+const publishBrowserBtn = document.getElementById('publishBrowserBtn');
 const userAvatar = document.getElementById('userAvatar');
 const userSection = document.getElementById('userSection');
 
@@ -110,6 +120,8 @@ const advancedEndpoint = '/hepai/api/explore';
 const sessionEndpoint = '/hepai/api/session';
 const logoutEndpoint = '/hepai/api/logout';
 const douyinLoginEndpoint = '/hepai/api/douyin/login';
+const douyinAppDeepLink = 'snssdk1128://';
+const douyinAdventureTag = '#和小孔一起去冒险';
 
 // 显示提示
 function showToast(message, duration = 3000) {
@@ -406,7 +418,65 @@ async function generateAdvancedAdventureImage() {
 }
 
 // 抖音登录功能
+function isWechatBrowser() {
+    return /MicroMessenger/i.test(navigator.userAgent || '');
+}
+
+async function copyCurrentLink() {
+    const currentUrl = window.location.origin + window.location.pathname;
+    try {
+        await navigator.clipboard.writeText(currentUrl);
+        showToast('链接已复制，请在系统浏览器打开', 3000);
+    } catch (error) {
+        showToast('复制失败，请手动复制当前页面链接', 3000);
+    }
+}
+
+async function copyAdventureTag() {
+    try {
+        await navigator.clipboard.writeText(douyinAdventureTag);
+        showToast('话题已复制，可直接粘贴到抖音', 3000);
+    } catch (error) {
+        showToast(`请手动复制：${douyinAdventureTag}`, 3000);
+    }
+}
+
+function downloadImage(url, filename) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
+function tryOpenDouyinApp() {
+    showToast('正在尝试唤起抖音...', 2000);
+    const start = Date.now();
+    window.location.href = douyinAppDeepLink;
+    setTimeout(() => {
+        if (Date.now() - start < 2200) {
+            showToast('若未成功唤起，请在浏览器中打开', 3000);
+        }
+    }, 1800);
+}
+
+function openPublishGuide(targetImage) {
+    if (!targetImage) {
+        showToast('请先生成图片后再发布', 3000);
+        return;
+    }
+
+    publishGuideModal.dataset.image = targetImage;
+    publishGuideModal.hidden = false;
+}
+
 function openDouyinLogin() {
+    if (isWechatBrowser()) {
+        wechatLoginModal.hidden = false;
+        return;
+    }
+
     showToast('正在跳转抖音授权...', 1500);
     setTimeout(() => {
         window.location.href = douyinLoginEndpoint;
@@ -444,11 +514,63 @@ closeLoginModal.addEventListener('click', (e) => {
     loginModal.hidden = true;
 });
 
+closeWechatLoginModal.addEventListener('click', (e) => {
+    e.preventDefault();
+    wechatLoginModal.hidden = true;
+});
+
+openDouyinAppBtn.addEventListener('click', () => {
+    tryOpenDouyinApp();
+});
+
+copyOpenLinkBtn.addEventListener('click', async () => {
+    await copyCurrentLink();
+});
+
 // 点击模态框外部关闭
 loginModal.addEventListener('click', (e) => {
     if (e.target === loginModal) {
         loginModal.hidden = true;
     }
+});
+
+wechatLoginModal.addEventListener('click', (e) => {
+    if (e.target === wechatLoginModal) {
+        wechatLoginModal.hidden = true;
+    }
+});
+
+closePublishGuideModal.addEventListener('click', (e) => {
+    e.preventDefault();
+    publishGuideModal.hidden = true;
+});
+
+publishGuideModal.addEventListener('click', (e) => {
+    if (e.target === publishGuideModal) {
+        publishGuideModal.hidden = true;
+    }
+});
+
+publishOpenDouyinBtn.addEventListener('click', () => {
+    tryOpenDouyinApp();
+});
+
+publishDownloadBtn.addEventListener('click', () => {
+    const targetImage = publishGuideModal.dataset.image;
+    if (!targetImage) {
+        showToast('当前没有可保存的图片', 3000);
+        return;
+    }
+    downloadImage(targetImage, 'xiaokong-adventure.png');
+    showToast('图片已开始下载，请保存后前往抖音发布', 3000);
+});
+
+publishCopyTagBtn.addEventListener('click', async () => {
+    await copyAdventureTag();
+});
+
+publishBrowserBtn.addEventListener('click', async () => {
+    await copyCurrentLink();
 });
 
 // 上传照片功能
@@ -703,25 +825,16 @@ async function publishToDouyin(targetType = 'simple') {
         showToast(targetType === 'advanced' ? '请先生成高阶冒险图！' : '请先生成冒险图！', 3000);
         return;
     }
-    
-    loadingOverlay.hidden = false;
-    loadingOverlay.querySelector('p').textContent = '正在发布到抖音...';
-    setUiBusy(true);
-    
-    // 模拟发布过程
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // 实际环境中调用抖音 SDK
-    // window.douyin.publish({
-    //     image: targetImage,
-    //     title: '和小孔一起去冒险',
-    //     hashtags: ['#和小孔一起去冒险']
-    // });
-    
-    loadingOverlay.hidden = true;
-    loadingOverlay.querySelector('p').textContent = 'AI正在生成中...';
-    setUiBusy(false);
-    showToast('发布成功！快来抖音查看吧', 4000);
+
+    await copyAdventureTag();
+
+    if (isWechatBrowser()) {
+        openPublishGuide(targetImage);
+        return;
+    }
+
+    tryOpenDouyinApp();
+    showToast('已尝试打开抖音，请先保存图片并粘贴话题发布', 3500);
 }
 
 publishBtn.addEventListener('click', () => publishToDouyin('simple'));
